@@ -85,7 +85,9 @@ int main() {
     }
 
     // Populate the exact solution buffer
-    for (double t : t_points) {
+    std::vector<double> t_points_exact_sol(std::begin(t_points), std::end(t_points));
+    t_points_exact_sol.insert(t_points_exact_sol.begin(), 0.0);
+    for (double t : t_points_exact_sol) {
         exact_solutions_itr->resize(M + 1);
         for (long m = 0; m < M + 1; m ++) {
             double xm = 1.0 / static_cast<double>(M) * static_cast<double>(m);
@@ -96,22 +98,27 @@ int main() {
 
     CSVWriter<5> ghost_pt_writer("sol_ghost_point.csv", {"x", "t=0", "t=0.06", "t=0.1", "t=0.9"});
     CSVWriter<5> one_sided_writer("sol_one_sided.csv", {"x", "t=0", "t=0.06", "t=0.1", "t=0.9"});
+    CSVWriter<5> exact_writer("sol_exact.csv", {"x", "t=0", "t=0.06", "t=0.1", "t=0.9"});
 
     for (long m = 0; m < M + 1; m ++) {
         double xm = 1.0 / static_cast<double>(M) * static_cast<double>(m);
 
         std::array<double, std::size(t_points) + 2> ghost_pt_line,
-                                                    one_sided_line;
+                                                    one_sided_line,
+                                                    exact_line;
 
         ghost_pt_line[0] = xm;
         one_sided_line[0] = xm;
+        exact_line[0] = xm;
         for (size_t i = 0; i < std::size(t_points) + 1; i ++) {
             ghost_pt_line[i + 1] = ghost_pt_solutions[i][m];
             one_sided_line[i + 1] = one_sided_solutions[i][m];
+            exact_line[i + 1] = exact_solutions[i][m];
         }
 
         ghost_pt_writer.append_line(ghost_pt_line);
         one_sided_writer.append_line(one_sided_line);
+        exact_writer.append_line(exact_line);
     }
 
     return 0;

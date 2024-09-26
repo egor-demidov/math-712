@@ -2,7 +2,9 @@
 
 !.gitignore
 !CMakeLists.txt
+!plot/
 !eigen/
 !heat_equation_1d/
 !*.cpp
 !*.h
+!*.plt
