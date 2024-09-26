@@ -11,9 +11,9 @@
 
 // BC_L, BC_R are functors that compute boundary conditions as a function of time
 template <typename BC_L, typename BC_R, typename IC>
-class HeatEquation1D {
+class HeatEquation1D_GhostPoints {
 public:
-    HeatEquation1D(long init_M, double init_nu, double init_dt)
+    HeatEquation1D_GhostPoints(long init_M, double init_nu, double init_dt)
         : M{init_M}
         , nu{init_nu}
         , t{0.0}

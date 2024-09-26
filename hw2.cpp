@@ -7,6 +7,7 @@
 
 #include "csv.h"
 #include "heat_equation_1d/heat_equation_1d_ghost_points.h"
+#include "heat_equation_1d/heat_equation_1d_one_sided.h"
 
 // Define the left boundary condition
 struct BC_L {
@@ -46,13 +47,15 @@ double l2_norm(std::span<const double> data_span) {
 
 int main() {
     constexpr long M = 10;
-    constexpr long N = 10;
-    constexpr double t_final = 0.1;
+    constexpr double t_final = 0.9;
+    constexpr long N = static_cast<long>(t_final / 0.004);
+    constexpr double nu = 1.0;
 
-    HeatEquation1D<BC_L, BC_R, IC> heat_equation(M, 1.0,  t_final / static_cast<double>(N));
+    HeatEquation1D_GhostPoints<BC_L, BC_R, IC> heat_equation_ghost_pts(M, nu,  t_final / static_cast<double>(N));
+    HeatEquation1D_OneSided<BC_L, BC_R, IC> heat_equation_one_sided(M, nu,  t_final / static_cast<double>(N));
 
     for (long n = 1; n <= N; n ++) {
-        auto sol = heat_equation.do_step();
+        auto sol = heat_equation_one_sided.do_step();
 
         std::cout << l2_norm(sol) << "\t\t";
         for (auto u : sol)
