@@ -43,8 +43,8 @@ public:
     }
 
     [[nodiscard]]
-    GridPoints const & get_u0() const {
-        return u0;
+    std::span<const double> get_u0() const {
+        return std::span<const double>(u);
     }
 
     std::span<const double> do_step() {
