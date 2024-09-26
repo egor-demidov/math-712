@@ -1,0 +1,7 @@
+*
+
+!.gitignore
+!CMakeLists.txt
+!eigen/
+!*.cpp
+!*.h
