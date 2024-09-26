@@ -3,5 +3,6 @@
 !.gitignore
 !CMakeLists.txt
 !eigen/
+!heat_equation_1d/
 !*.cpp
 !*.h
