@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <array>
+#include <iostream>
 
 template <unsigned long n_cols>
 class CSVWriter {

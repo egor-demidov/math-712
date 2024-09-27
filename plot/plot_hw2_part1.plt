@@ -2,7 +2,7 @@
 
 set encoding utf8
 set term pngcairo size 600*1.5, 400*1.5 font "Helvetica,"
-set output "sol_ghost_plot.png"
+set output "hw2_part1.png"
 
 set datafile separator ","
 set key autotitle columnhead
@@ -10,7 +10,7 @@ set key autotitle columnhead
 set multiplot layout 2, 2 rowsfirst
 
 set xlabel "x"
-set ylabel "u"
+set ylabel "v"
 set ytics 0.2
 
 POS = "at graph 0.90,0.90 font ',20'"

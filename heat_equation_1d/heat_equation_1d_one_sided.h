@@ -48,6 +48,7 @@ public:
     }
 
     std::span<const double> do_step() {
+        #pragma omp parallel for
         for (long m = 1; m < static_cast<long>(u.size()) - 1; m ++) {
             // To manipulate array data, use index i which is equivalent to theoretical index m
             u_new[m] = u[m] + nu * dt / h / h * (u[m+1] - 2.0 * u[m] + u[m-1]);
