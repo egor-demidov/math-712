@@ -55,6 +55,7 @@ public:
     }
 
     std::span<const double> do_step() {
+        #pragma omp parallel for
         for (long i = 0; i < static_cast<long>(u.size()); i ++) {
             long m = array_to_real_index(i);
 

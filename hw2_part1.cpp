@@ -49,7 +49,7 @@ int main() {
         return static_cast<long>(t / dt);
     });
 
-    auto exact_solution_fun = [nu](double x, double t) {
+    auto exact_solution_fun = [](double x, double t) {
         return cos(M_PI * x / 2.0) * exp(-nu * M_PI * M_PI / 4.0 * t);
     };
 
