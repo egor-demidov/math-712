@@ -3,8 +3,7 @@
 !.gitignore
 !CMakeLists.txt
 !plot/
-!eigen/
-!heat_equation_1d/
+!hw2/
 !*.cpp
 !*.c
 !*.h
