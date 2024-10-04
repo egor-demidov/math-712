@@ -55,13 +55,13 @@ double compute_l2_norm_of_error(double * v, double t, double nu, long M) {
 }
 
 void part2() {
-    const long M_values[] = {10, 100, 1000, 10000, 100000};
+    const long M_values[] = {8, 16, 32, 64, 128, 256, 512/*, 1024, 2048*/};
     const double dt_over_h2 = 0.004 / 0.01;
     const double nu = 1.0;
     const double t_tot = 2.0;
 
-    const char * col_names[] = {"h", "o1", "o2"};
-    csv_writer_t csv_writer = open_csv_writer("hw2_part2.csv", col_names, 3);
+    const char * col_names[] = {"h", "log(h)", "o1", "log(o1)", "o2", "log(o2)"};
+    csv_writer_t csv_writer = open_csv_writer("hw2_part2.csv", col_names, 6);
 
     for (long i = 0; i < sizeof(M_values) / sizeof(M_values[0]); i ++) {
         long M = M_values[i];
@@ -103,10 +103,15 @@ void part2() {
 
         printf("%lf\t%le\t%le\n", h, l2_norm_1o, l2_norm_2o);
 
+        double csv_line[] = {h, log2(h), l2_norm_1o, log2(l2_norm_1o), l2_norm_2o, log2(l2_norm_2o)};
+        append_csv_line(csv_writer, csv_line);
+
         // Free the buffers
         free(v);
         free(buffer);
     }
+
+    close_csv_writer(csv_writer);
 }
 
 int main() {
