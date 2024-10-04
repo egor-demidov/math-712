@@ -16,12 +16,20 @@ void part1() {
     const double dt = 0.004;
     const double nu = 1.0;
     const double c = nu * dt / h / h;
-    const double time_points[] = {0.06, 0.1, 0.9};
+    const long time_points[] = {(long) (0.06 / dt), (long) (0.1 / dt), (long)(0.9 / dt)};
+    const char * col_names[] = {"t=0.06", "t=0.1", "t=0.9"};
+    const long N = time_points[sizeof(time_points) / sizeof(time_points[0]) - 1];
+
+    // Allocate memory for select solutions
+    double * saved_solutions_o1 = (double *) malloc(sizeof(double) * (M + 1) * (sizeof(time_points) / sizeof(time_points[0])));
+    double * saved_solutions_o2 = (double *) malloc(sizeof(double) * (M + 1) * (sizeof(time_points) / sizeof(time_points[0])));
 
     // Allocate memory for the solution vector and the temporary buffer
     double * v, * buffer;
     v = (double *) malloc(sizeof(double) * (M + 1));
     buffer = (double *) malloc(sizeof(double) * (M + 1));
+
+    ////// SOLVE THE PROBLEM USING 1ST ORDER APPROXIMATION
 
     // Populate the initial condition
     for (long m = 0; m < M + 1; m ++) {
@@ -29,22 +37,72 @@ void part1() {
         v[m] = cos(M_PI * xm / 2.0);
     }
 
-    for (long n = 1; n < 1000000; n ++) {
-        do_step_2nd_order_bc(&v, &buffer, c, M);
+    const long * target_time_ptr = &time_points[0];
+    for (long n = 1; n < N + 1; n ++) {
+        do_step_1st_order_bc(&v, &buffer, c, M);
+
+        if (n == *target_time_ptr) {
+            // Store solution
+            memcpy(&saved_solutions_o1[(M + 1) * (target_time_ptr - time_points)], v, sizeof(double) * (M + 1));
+            target_time_ptr ++;
+        }
     }
 
-    // Output the results
+    ////// SOLVE THE PROBLEM USING 2ND ORDER APPROXIMATION
+
+    // Populate the initial condition
     for (long m = 0; m < M + 1; m ++) {
         double xm = h * (double) m;
-        printf("%.4f\t%.4f\n", xm, v[m]);
+        v[m] = cos(M_PI * xm / 2.0);
     }
+
+    target_time_ptr = &time_points[0];
+    for (long n = 1; n < N + 1; n ++) {
+        do_step_2nd_order_bc(&v, &buffer, c, M);
+
+        if (n == *target_time_ptr) {
+            // Store solution
+            memcpy(&saved_solutions_o2[(M + 1) * (target_time_ptr - time_points)], v, sizeof(double) * (M + 1));
+            target_time_ptr ++;
+        }
+    }
+
+    // Write out the solutions
+    const char * extended_titles[sizeof(time_points) / sizeof(time_points[0]) + 1];
+    extended_titles[0] = "x";
+    for (long i = 0; i < sizeof(time_points) / sizeof(time_points[0]); i ++) {
+        extended_titles[i + 1] = col_names[i];
+    }
+
+    csv_writer_t csv_writer_1o = open_csv_writer("hw2_part1_o1.csv", extended_titles, sizeof(time_points) / sizeof(time_points[0]) + 1);
+    csv_writer_t csv_writer_2o = open_csv_writer("hw2_part1_o2.csv", extended_titles, sizeof(time_points) / sizeof(time_points[0]) + 1);
+
+    for (long m = 0; m < M + 1; m ++) {
+        double data_arr[sizeof(time_points) / sizeof(time_points[0]) + 1];
+        double xm = (double) m * h;
+        data_arr[0] = xm;
+        for (long j = 0; j < sizeof(time_points) / sizeof(time_points[0]); j ++) {
+            data_arr[j + 1] = saved_solutions_o1[(M + 1) * j + m];
+        }
+        append_csv_line(csv_writer_1o, data_arr);
+
+        for (long j = 0; j < sizeof(time_points) / sizeof(time_points[0]); j ++) {
+            data_arr[j + 1] = saved_solutions_o2[(M + 1) * j + m];
+        }
+        append_csv_line(csv_writer_2o, data_arr);
+    }
+
+    close_csv_writer(csv_writer_1o);
+    close_csv_writer(csv_writer_2o);
 
     // Free the buffers
     free(v);
     free(buffer);
+    free(saved_solutions_o1);
+    free(saved_solutions_o2);
 }
 
-double compute_l2_norm_of_error(double * v, double t, double nu, long M) {
+double compute_l2_norm_of_error(double * v, double t, double nu, long M, double h) {
     double l2_norm = 0.0;
     for (long m = 0; m < M + 1; m ++) {
         double xm = (double) m / (double) M;
@@ -55,7 +113,7 @@ double compute_l2_norm_of_error(double * v, double t, double nu, long M) {
 }
 
 void part2() {
-    const long M_values[] = {8, 16, 32, 64, 128, 256, 512/*, 1024, 2048*/};
+    const long M_values[] = {8, 16, 32, 64, 128, 256, 512, 1024, 2048};
     const double dt_over_h2 = 0.004 / 0.01;
     const double nu = 1.0;
     const double t_tot = 2.0;
@@ -87,7 +145,7 @@ void part2() {
             do_step_1st_order_bc(&v, &buffer, c, M);
         }
 
-        l2_norm_1o = compute_l2_norm_of_error(v, t_tot, nu, M);
+        l2_norm_1o = compute_l2_norm_of_error(v, t_tot, nu, M, h);
 
         // Populate the initial condition
         for (long m = 0; m < M + 1; m ++) {
@@ -99,7 +157,7 @@ void part2() {
             do_step_2nd_order_bc(&v, &buffer, c, M);
         }
 
-        l2_norm_2o = compute_l2_norm_of_error(v, t_tot, nu, M);
+        l2_norm_2o = compute_l2_norm_of_error(v, t_tot, nu, M, h);
 
         printf("%lf\t%le\t%le\n", h, l2_norm_1o, l2_norm_2o);
 
@@ -115,7 +173,8 @@ void part2() {
 }
 
 int main() {
-    part2();
+    part1();
+//    part2();
 
     return 0;
 }

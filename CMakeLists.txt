@@ -5,6 +5,8 @@ find_package(OpenMP)
 
 set(CMAKE_C_FLAGS "-O3 -Wall -Wextra -Wuninitialized -Rpass-analysis=loop-vectorize -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -march=native ${CMAKE_C_FLAGS}")
 
+add_compile_definitions(_USE_MATH_DEFINES)
+
 add_executable(hw2 hw2/hw2.c hw2/heat_equation_fwd.c csv_writer.c)
 
 if (${OpenMP_FOUND})
