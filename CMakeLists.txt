@@ -8,6 +8,9 @@ set(CMAKE_C_FLAGS "-O3 -Wall -Wextra -Wuninitialized -Rpass-analysis=loop-vector
 add_compile_definitions(_USE_MATH_DEFINES)
 
 add_executable(hw2 hw2/hw2.c hw2/heat_equation_fwd.c csv_writer.c)
+add_executable(hw3 hw3/hw3.c csv_writer.c)
+
+target_link_libraries(hw3 m)
 
 if (${OpenMP_FOUND})
     target_link_libraries(hw2 m OpenMP::OpenMP_C)
